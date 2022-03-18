@@ -1,5 +1,5 @@
 ###############
-# RDS Resources
+# RDS Source Resources
 ###############
 
 module "db" {
