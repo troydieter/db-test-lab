@@ -43,6 +43,16 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   role       = aws_iam_role.dms-vpc-role.name
 }
 
+# Create a new replication subnet group
+resource "aws_dms_replication_subnet_group" "replsubnetgroup" {
+  replication_subnet_group_description = "DMS replication subnet group"
+  replication_subnet_group_id          = "dms-replication-subnet-group-${random_id.rando.hex}"
+
+  subnet_ids = module.vpc.public_subnets
+
+  tags = local.common-tags
+}
+
 resource "aws_dms_replication_instance" "replinstance" {
   allocated_storage            = 50
   apply_immediately            = true
@@ -54,7 +64,7 @@ resource "aws_dms_replication_instance" "replinstance" {
   publicly_accessible          = true
   replication_instance_class   = "dms.t3.micro"
   replication_instance_id      = "dms-replication-instance-tf-${random_id.rando.hex}"
-  replication_subnet_group_id  = module.vpc.public_subnets[0]
+  replication_subnet_group_id  = aws_dms_replication_subnet_group.replsubnetgroup.replication_subnet_group_id
 
   tags = {
     Name = "repl-${random_id.rando.hex}"
