@@ -1,3 +1,7 @@
+###############
+# Microsoft AD Resources
+###############
+
 resource "aws_directory_service_directory" "demo" {
   name     = "corp.db.lab"
   password = "SuperSecretPassw0rd"
@@ -11,4 +15,18 @@ resource "aws_directory_service_directory" "demo" {
   }
 
   tags = local.common-tags
+}
+
+resource "aws_iam_role" "rds_ad_auth" {
+  name                  = "rds-ad-auth"
+  description           = "Role used by RDS for Active Directory authentication and authorization"
+  force_detach_policies = true
+  assume_role_policy    = data.aws_iam_policy_document.rds_assume_role.json
+
+  tags = local.common-tags
+}
+
+resource "aws_iam_role_policy_attachment" "rds_directory_services" {
+  role       = aws_iam_role.rds_ad_auth.id
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSDirectoryServiceAccess"
 }
