@@ -54,11 +54,11 @@ resource "aws_dms_replication_subnet_group" "replsubnetgroup" {
 }
 
 resource "aws_dms_replication_instance" "replinstance" {
-  allocated_storage            = 50
-  apply_immediately            = true
-  auto_minor_version_upgrade   = true
-  engine_version               = "3.1.4"
-#   kms_key_arn                  = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
+  allocated_storage          = 50
+  apply_immediately          = true
+  auto_minor_version_upgrade = true
+  engine_version             = "3.1.4"
+  #   kms_key_arn                  = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
   multi_az                     = true
   preferred_maintenance_window = "sun:10:30-sun:14:30"
   publicly_accessible          = true
@@ -70,7 +70,7 @@ resource "aws_dms_replication_instance" "replinstance" {
     Name = "repl-${random_id.rando.hex}"
   }
 
-  vpc_security_group_ids = module.security_group.security_group_id
+  vpc_security_group_ids = [module.security_group.security_group_id]
 
   depends_on = [
     aws_iam_role_policy_attachment.dms-access-for-endpoint-AmazonDMSRedshiftS3Role,
