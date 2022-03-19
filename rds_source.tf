@@ -13,7 +13,7 @@ module "db" {
   engine_version       = "15.00.4153.1.v1"
   family               = "sqlserver-ex-15.0" # DB parameter group
   major_engine_version = "15.00"             # DB option group
-  instance_class       = "db.t3.large"
+  instance_class       = "db.t3.small"
 
   allocated_storage     = 20
   max_allocated_storage = 100
@@ -33,8 +33,8 @@ module "db" {
   enabled_cloudwatch_logs_exports = ["general"]
   create_cloudwatch_log_group     = true
   db_subnet_group_name            = module.vpc.database_subnet_group_name
-  create_db_option_group = false
-  create_db_parameter_group = false
+  create_db_option_group = true
+  create_db_parameter_group = true
 
   backup_retention_period = 7
   skip_final_snapshot     = true

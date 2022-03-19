@@ -18,5 +18,5 @@ variable "environment" {
 variable "application" {
   description = "DB"
   type        = string
-  default     = "data_manip"
+  default     = "data-lab"
 }
