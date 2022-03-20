@@ -21,6 +21,10 @@ resource "aws_iam_role" "dms-access-for-endpoint" {
 resource "aws_iam_role_policy_attachment" "dms-access-for-endpoint-AmazonDMSRedshiftS3Role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSRedshiftS3Role"
   role       = aws_iam_role.dms-access-for-endpoint.name
+
+  provisioner "local-exec" {
+    command = "sleep 30"
+  }
 }
 
 resource "aws_iam_role" "dms-cloudwatch-logs-role" {

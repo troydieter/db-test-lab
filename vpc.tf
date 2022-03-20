@@ -30,10 +30,10 @@ module "security_group" {
   # ingress
   ingress_with_cidr_blocks = [
     {
-      from_port   = 1433
-      to_port     = 1433
+      from_port   = 3306
+      to_port     = 3306
       protocol    = "tcp"
-      description = "MSSQL access from within VPC"
+      description = "MySQL access from within VPC"
       cidr_blocks = module.vpc.vpc_cidr_block
     },
   ]

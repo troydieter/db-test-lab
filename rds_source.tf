@@ -9,38 +9,36 @@ module "db" {
 
   identifier = "dbtestlabrds"
 
-  engine               = "sqlserver-ex"
-  engine_version       = "15.00.4153.1.v1"
-  family               = "sqlserver-ex-15.0" # DB parameter group
-  major_engine_version = "15.00"             # DB option group
+  engine               = "mysql"
+  engine_version       = "8.0.27"
+  family               = "mysql8.0" # DB parameter group
+  major_engine_version = "8.00"     # DB option group
   instance_class       = "db.t3.small"
 
   allocated_storage     = 20
   max_allocated_storage = 100
 
-  domain               = aws_directory_service_directory.demo.id
-  domain_iam_role_name = aws_iam_role.rds_ad_auth.name
-
-  username = "${var.application}_dbuser"
+  db_name  = "test"
+  username = "dblabs_user"
   port     = 3306
 
   multi_az                        = true
   subnet_ids                      = module.vpc.database_subnets
   vpc_security_group_ids          = [module.security_group.security_group_id]
-  license_model                   = "license-included"
+  license_model                   = "general-public-license"
   maintenance_window              = "Mon:00:00-Mon:03:00"
   backup_window                   = "03:00-06:00"
   enabled_cloudwatch_logs_exports = ["general"]
   create_cloudwatch_log_group     = true
   db_subnet_group_name            = module.vpc.database_subnet_group_name
-  create_db_option_group = true
-  create_db_parameter_group = true
+  create_db_option_group          = false
+  create_db_parameter_group       = true
 
   backup_retention_period = 7
   skip_final_snapshot     = true
   deletion_protection     = false
 
-  performance_insights_enabled          = true
+  performance_insights_enabled          = false
   performance_insights_retention_period = 7
   create_monitoring_role                = true
   monitoring_interval                   = 60
