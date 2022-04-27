@@ -5,7 +5,7 @@
 module "db" {
 
   source  = "terraform-aws-modules/rds/aws"
-  version = "4.2.0"
+  version = "4.3.0"
 
   identifier = "dbtestlabrds"
 
