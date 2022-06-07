@@ -20,3 +20,8 @@ variable "application" {
   type        = string
   default     = "data-lab"
 }
+
+variable "file_gw_activation_key" {
+  description = "Activation Key retrieved from the Appliance"
+  type = string
+}
