@@ -9,6 +9,6 @@
 resource "aws_storagegateway_gateway" "local_filegateway" {
   gateway_ip_address = var.gateway_ip_address
   gateway_name       = "testlab-${random_id.rando.hex}"
-  gateway_timezone   = "EST"
+  gateway_timezone   = "GMT-4:00"
   gateway_type       = "FILE_S3"
 }

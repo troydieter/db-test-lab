@@ -15,6 +15,8 @@ module "s3_bucket" {
     enabled = true
   }
 
+  tags = local.common-tags
+
 }
 
 # IAM role and policy
@@ -22,6 +24,20 @@ module "s3_bucket" {
 resource "aws_iam_role" "filegw_role" {
   name        = "s3_filegateway_role-${random_id.rando.hex}"
   description = "Used for S3 file gateway fileshares"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "storagegateway.amazonaws.com"
+        }
+      },
+    ]
+  })
+  tags = local.common-tags
 }
 
 resource "aws_iam_policy" "filegw_pol" {
@@ -40,7 +56,7 @@ resource "aws_iam_policy" "filegw_pol" {
                 "s3:ListBucketVersions",
                 "s3:ListBucketMultipartUploads"
             ],
-            "Resource": "arn:aws:s3:::${module.s3_bucket.s3_bucket_name}",
+            "Resource": "arn:aws:s3:::${module.s3_bucket.s3_bucket_id}",
             "Effect": "Allow"
         },
         {
@@ -55,7 +71,7 @@ resource "aws_iam_policy" "filegw_pol" {
                 "s3:PutObject",
                 "s3:PutObjectAcl"
             ],
-            "Resource": "arn:aws:s3:::${module.s3_bucket.s3_bucket_name}/*",
+            "Resource": "arn:aws:s3:::${module.s3_bucket.s3_bucket_id}/*",
             "Effect": "Allow"
         }
     ]
@@ -75,4 +91,5 @@ resource "aws_storagegateway_smb_file_share" "local_filegateway_share" {
   gateway_arn    = aws_storagegateway_gateway.local_filegateway.arn
   location_arn   = module.s3_bucket.s3_bucket_arn
   role_arn       = aws_iam_role.filegw_role.arn
+  tags = local.common-tags
 }
