@@ -16,11 +16,11 @@ module "file_storage_gateway_log_group" {
 }
 
 resource "aws_storagegateway_gateway" "local_filegateway" {
-  gateway_ip_address = var.gateway_ip_address
-  gateway_name       = "testlab-${random_id.rando.hex}"
-  gateway_timezone   = "GMT-4:00"
-  gateway_type       = "FILE_S3"
+  gateway_ip_address       = var.gateway_ip_address
+  gateway_name             = "testlab-${random_id.rando.hex}"
+  gateway_timezone         = "GMT-4:00"
+  gateway_type             = "FILE_S3"
   cloudwatch_log_group_arn = module.file_storage_gateway_log_group.cloudwatch_log_group_arn
-  smb_guest_password = var.smb_guest_password
-  tags = local.common-tags
+  smb_guest_password       = var.smb_guest_password
+  tags                     = local.common-tags
 }

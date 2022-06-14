@@ -28,6 +28,12 @@ variable "gateway_ip_address" {
 
 variable "smb_guest_password" {
   description = "Password for the File Gateway File Share"
-  type = string
-  default = "majic123400"
+  type        = string
+  default     = "majic123400"
+}
+
+variable "active_directory_pw" {
+  description = "Default password for Active Directory"
+  type        = string
+  default     = "maj!c8800!!"
 }
