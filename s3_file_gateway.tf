@@ -7,7 +7,7 @@
 ###############
 
 # Cloudwatch Log Group
-module "log_group" {
+module "log_group" "file_storage_gateway_log_group" {
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
   version = "~> 3.0"
 
@@ -20,7 +20,7 @@ resource "aws_storagegateway_gateway" "local_filegateway" {
   gateway_name       = "testlab-${random_id.rando.hex}"
   gateway_timezone   = "GMT-4:00"
   gateway_type       = "FILE_S3"
-  cloudwatch_log_group_arn = module.log_group.cloudwatch_log_group_arn
+  cloudwatch_log_group_arn = module.log_group.file_storage_gateway_log_group.cloudwatch_log_group_arn
   smb_guest_password = var.smb_guest_password
   tags = local.common-tags
 }
