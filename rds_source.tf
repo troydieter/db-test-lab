@@ -75,7 +75,7 @@ module "db" {
   username = "dblabs_user"
   port     = 1433
 
-  multi_az                        = true
+  multi_az                        = false
   subnet_ids                      = module.vpc.database_subnets
   vpc_security_group_ids          = [module.security_group.security_group_id]
   license_model                   = "license-included"
@@ -85,9 +85,10 @@ module "db" {
   create_cloudwatch_log_group     = true
   db_subnet_group_name            = module.vpc.database_subnet_group_name
   create_db_option_group          = false
-  create_db_parameter_group       = true
+  create_db_parameter_group       = false
   domain                          = aws_directory_service_directory.testlab.id
   domain_iam_role_name            = aws_iam_role.rds_ad_auth.name
+  storage_encrypted               = false
 
   backup_retention_period = 7
   skip_final_snapshot     = true
@@ -99,16 +100,6 @@ module "db" {
   monitoring_interval                   = 60
   monitoring_role_name                  = "${var.application}-rds-mon-${random_id.rando.hex}"
   create_random_password                = true
-  parameters = [
-    {
-      name  = "character_set_client"
-      value = "utf8mb4"
-    },
-    {
-      name  = "character_set_server"
-      value = "utf8mb4"
-    }
-  ]
 
   tags = local.common-tags
   db_instance_tags = {
