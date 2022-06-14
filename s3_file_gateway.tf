@@ -11,4 +11,5 @@ resource "aws_storagegateway_gateway" "local_filegateway" {
   gateway_name       = "testlab-${random_id.rando.hex}"
   gateway_timezone   = "GMT-4:00"
   gateway_type       = "FILE_S3"
+  tags = local.common-tags
 }
