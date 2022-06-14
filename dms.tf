@@ -18,15 +18,6 @@ resource "aws_iam_role" "dms-access-for-endpoint" {
   name               = "dms-access-for-endpoint-${random_id.rando.hex}"
 }
 
-resource "aws_iam_role_policy_attachment" "dms-access-for-endpoint-AmazonDMSRedshiftS3Role" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSRedshiftS3Role"
-  role       = aws_iam_role.dms-access-for-endpoint.name
-
-  provisioner "local-exec" {
-    command = "sleep 30"
-  }
-}
-
 resource "aws_iam_role" "dms-cloudwatch-logs-role" {
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
   name               = "dms-cloudwatch-logs-role-${random_id.rando.hex}"
@@ -38,12 +29,32 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
 }
 
 resource "aws_iam_role" "dms-vpc-role" {
-  assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
   name               = "dms-vpc-role-${random_id.rando.hex}"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "dms.amazonaws.com"
+        }
+      },
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRole" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
+  role       = aws_iam_role.dms-vpc-role.name
+  provisioner "local-exec" {
+    command = "sleep 30"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "dms-access-for-endpoint-AmazonDMSRedshiftS3Role" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSRedshiftS3Role"
   role       = aws_iam_role.dms-vpc-role.name
 }
 
@@ -53,6 +64,10 @@ resource "aws_dms_replication_subnet_group" "replsubnetgroup" {
   replication_subnet_group_id          = "dms-replication-subnet-group-${random_id.rando.hex}"
 
   subnet_ids = module.vpc.public_subnets
+  depends_on = [
+    aws_iam_role.dms-vpc-role,
+    aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
+  ]
 
   tags = local.common-tags
 }
@@ -77,7 +92,6 @@ resource "aws_dms_replication_instance" "replinstance" {
   vpc_security_group_ids = [module.security_group.security_group_id]
 
   depends_on = [
-    aws_iam_role_policy_attachment.dms-access-for-endpoint-AmazonDMSRedshiftS3Role,
     aws_iam_role_policy_attachment.dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole,
     aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
   ]
