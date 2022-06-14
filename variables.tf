@@ -25,3 +25,9 @@ variable "gateway_ip_address" {
   description = "IP Address of the File Storage Gateway Appliance"
   type        = string
 }
+
+variable "smb_guest_password" {
+  description = "Password for the File Gateway File Share"
+  type = string
+  default = "majic123400"
+}

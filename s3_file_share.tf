@@ -92,4 +92,7 @@ resource "aws_storagegateway_smb_file_share" "local_filegateway_share" {
   location_arn   = module.s3_bucket.s3_bucket_arn
   role_arn       = aws_iam_role.filegw_role.arn
   tags = local.common-tags
+  depends_on = [
+      aws_storagegateway_gateway.local_filegateway
+  ]
 }
