@@ -91,7 +91,7 @@ resource "aws_storagegateway_smb_file_share" "local_filegateway_share" {
   gateway_arn    = aws_storagegateway_gateway.local_filegateway.arn
   location_arn   = module.s3_bucket.s3_bucket_arn
   role_arn       = aws_iam_role.filegw_role.arn
-  audit_destination_arn = module.log_group.file_share_log_group.cloudwatch_log_group_arn
+  audit_destination_arn = module.file_share_log_group.cloudwatch_log_group_arn
   tags = local.common-tags
   depends_on = [
       aws_storagegateway_gateway.local_filegateway
@@ -99,7 +99,7 @@ resource "aws_storagegateway_smb_file_share" "local_filegateway_share" {
 }
 
 # Audit logs for fileshare
-module "log_group" "file_share_log_group" {
+module "file_share_log_group" {
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
   version = "~> 3.0"
 
