@@ -71,7 +71,6 @@ module "db" {
   allocated_storage     = 20
   max_allocated_storage = 100
 
-  db_name  = "test"
   username = "dblabs_user"
   port     = 1433
 
@@ -81,7 +80,7 @@ module "db" {
   license_model                   = "license-included"
   maintenance_window              = "Mon:00:00-Mon:03:00"
   backup_window                   = "03:00-06:00"
-  enabled_cloudwatch_logs_exports = ["general"]
+  enabled_cloudwatch_logs_exports = ["error"]
   create_cloudwatch_log_group     = true
   db_subnet_group_name            = module.vpc.database_subnet_group_name
   create_db_option_group          = false
