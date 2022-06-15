@@ -61,7 +61,6 @@ module "db" {
   version = "4.2.0"
 
   identifier = "dbtestlabrds${random_id.rando.hex}"
-  db_name = "db-${random_id.rando.hex}"
   engine               = "sqlserver-ex"
   engine_version       = "15.00.4153.1.v1"
   family               = "sqlserver-ex-15.0" # DB parameter group
