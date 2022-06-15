@@ -59,6 +59,7 @@ resource "aws_dms_replication_subnet_group" "replsubnetgroup" {
   tags = local.common-tags
 }
 
+# DMS Replication Instance
 resource "aws_dms_replication_instance" "replinstance" {
   allocated_storage          = 50
   apply_immediately          = true
@@ -83,4 +84,21 @@ resource "aws_dms_replication_instance" "replinstance" {
     aws_iam_role_policy_attachment.dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole,
     aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
   ]
+}
+
+# DMS Source Endpoint
+resource "aws_dms_endpoint" "dbtestlabsourceendpoint" {
+  database_name               = module.db.db_instance_name
+  endpoint_id                 = "db-test-lab-endpoint-source-${random_id.rando.hex}"
+  endpoint_type               = "source"
+  engine_name                 = "sqlserver"
+  extra_connection_attributes = ""
+  password                    = module.db.db_instance_password
+  port                        = module.db.db_instance_port
+  server_name                 = module.db.db_instance_endpoint
+  ssl_mode                    = "none"
+
+  tags = local.common-tags
+
+  username = module.db.db_instance_username
 }
