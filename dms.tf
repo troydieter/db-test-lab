@@ -89,6 +89,7 @@ resource "aws_dms_replication_instance" "replinstance" {
 # DMS Source Endpoint
 resource "aws_dms_endpoint" "dbtestlabsourceendpoint" {
   endpoint_id                 = "db-test-lab-endpoint-source-${random_id.rando.hex}"
+  database_name               = "${var.dms_endpoint_dbname}-${random_id.rando.hex}"
   endpoint_type               = "source"
   engine_name                 = "sqlserver"
   extra_connection_attributes = ""

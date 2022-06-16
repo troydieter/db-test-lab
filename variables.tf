@@ -37,3 +37,9 @@ variable "active_directory_pw" {
   type        = string
   default     = "maj!c8800!!"
 }
+
+variable "dms_endpoint_dbname" {
+  description = "Database name used for the source DMS endpoint"
+  type        = string
+  default     = "labdb"
+}
