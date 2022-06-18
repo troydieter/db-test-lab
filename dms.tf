@@ -118,7 +118,6 @@ resource "aws_dms_replication_task" "dbtestlab_repl_task" {
   migration_type            = "full-load-and-cdc"
   replication_instance_arn  = aws_dms_replication_instance.replinstance.replication_instance_arn
   replication_task_id       = "${var.application}-repl-task-${random_id.rando.hex}"
-  replication_task_settings = "..."
   source_endpoint_arn       = aws_dms_endpoint.dbtestlab_source_endpoint.endpoint_arn
   target_endpoint_arn = aws_dms_endpoint.dbtestlab_dest_endpoint.endpoint_arn
   table_mappings            = "{\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"1\",\"rule-name\":\"1\",\"object-locator\":{\"schema-name\":\"%\",\"table-name\":\"%\"},\"rule-action\":\"include\"}]}"
