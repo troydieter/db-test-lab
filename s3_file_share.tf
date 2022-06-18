@@ -5,7 +5,7 @@
 
 # S3 Bucket creation for file share
 
-module "s3_bucket" {
+module "filegw_dest_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
   bucket = "file-gateway-share-${random_id.rando.hex}"
@@ -56,7 +56,7 @@ resource "aws_iam_policy" "filegw_pol" {
                 "s3:ListBucketVersions",
                 "s3:ListBucketMultipartUploads"
             ],
-            "Resource": "arn:aws:s3:::${module.s3_bucket.s3_bucket_id}",
+            "Resource": "arn:aws:s3:::${module.filegw_dest_bucket.s3_bucket_id}",
             "Effect": "Allow"
         },
         {
@@ -71,7 +71,7 @@ resource "aws_iam_policy" "filegw_pol" {
                 "s3:PutObject",
                 "s3:PutObjectAcl"
             ],
-            "Resource": "arn:aws:s3:::${module.s3_bucket.s3_bucket_id}/*",
+            "Resource": "arn:aws:s3:::${module.filegw_dest_bucket.s3_bucket_id}/*",
             "Effect": "Allow"
         }
     ]
@@ -89,7 +89,7 @@ resource "aws_iam_role_policy_attachment" "filegw_attach" {
 resource "aws_storagegateway_smb_file_share" "local_filegateway_share" {
   authentication        = "GuestAccess"
   gateway_arn           = aws_storagegateway_gateway.local_filegateway.arn
-  location_arn          = module.s3_bucket.s3_bucket_arn
+  location_arn          = module.filegw_dest_bucket.s3_bucket_arn
   role_arn              = aws_iam_role.filegw_role.arn
   audit_destination_arn = module.file_share_log_group.cloudwatch_log_group_arn
   tags                  = local.common-tags

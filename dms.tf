@@ -59,6 +59,85 @@ resource "aws_dms_replication_subnet_group" "replsubnetgroup" {
   tags = local.common-tags
 }
 
+module "dms_endpoint_s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  bucket = "dms-endpoint-${random_id.rando.hex}"
+  acl    = "private"
+
+  versioning = {
+    enabled = true
+  }
+
+  tags = local.common-tags
+
+}
+
+# IAM role and policy
+
+resource "aws_iam_role" "dms_s3_role" {
+  name        = "s3_dms_role-${random_id.rando.hex}"
+  description = "Used for DMS endpoints"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "dms.amazonaws.com"
+        }
+      },
+    ]
+  })
+  tags = local.common-tags
+}
+
+resource "aws_iam_policy" "dms_s3_pol" {
+  name        = "s3_dms_s3_pol-${random_id.rando.hex}"
+  description = "Used for DMS endpoint processing"
+  policy      = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:GetAccelerateConfiguration",
+                "s3:GetBucketLocation",
+                "s3:GetBucketVersioning",
+                "s3:ListBucket",
+                "s3:ListBucketVersions",
+                "s3:ListBucketMultipartUploads"
+            ],
+            "Resource": "arn:aws:s3:::${module.dms_endpoint_s3_bucket.s3_bucket_id}",
+            "Effect": "Allow"
+        },
+        {
+            "Action": [
+                "s3:AbortMultipartUpload",
+                "s3:DeleteObject",
+                "s3:DeleteObjectVersion",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:GetObjectVersion",
+                "s3:ListMultipartUploadParts",
+                "s3:PutObject",
+                "s3:PutObjectAcl"
+            ],
+            "Resource": "arn:aws:s3:::${module.dms_endpoint_s3_bucket.s3_bucket_id}/*",
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "dms_s3_endpoint_attach" {
+  role       = aws_iam_role.dms_s3_role.name
+  policy_arn = aws_iam_policy.dms_s3_pol.arn
+}
+
 # DMS Replication Instance
 resource "aws_dms_replication_instance" "replinstance" {
   allocated_storage          = 50
@@ -108,6 +187,12 @@ resource "aws_dms_endpoint" "dbtestlab_dest_endpoint" {
   endpoint_id                 = "${var.application}-endpoint-dest-${random_id.rando.hex}"
   endpoint_type               = "target"
   engine_name                 = "s3"
+  s3_settings {
+    service_access_role_arn = aws_iam_role.dms_s3_role.arn
+    bucket_name = module.dms_endpoint_s3_bucket.s3_bucket_id
+    bucket_folder = "dms_dest"
+    compression_type = "GZIP"
+  }
 
   tags = local.common-tags
 
