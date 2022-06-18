@@ -18,7 +18,7 @@ variable "environment" {
 variable "application" {
   description = "DB"
   type        = string
-  default     = "data-lab"
+  default     = "db-test-lab"
 }
 
 variable "gateway_ip_address" {

@@ -70,7 +70,7 @@ resource "aws_dms_replication_instance" "replinstance" {
   preferred_maintenance_window = "sun:10:30-sun:14:30"
   publicly_accessible          = true
   replication_instance_class   = "dms.t3.micro"
-  replication_instance_id      = "dms-replication-instance-tf-${random_id.rando.hex}"
+  replication_instance_id      = "${var.application}-repl-instance-${random_id.rando.hex}"
   replication_subnet_group_id  = aws_dms_replication_subnet_group.replsubnetgroup.replication_subnet_group_id
 
   tags = {
@@ -87,8 +87,8 @@ resource "aws_dms_replication_instance" "replinstance" {
 }
 
 # DMS Source Endpoint
-resource "aws_dms_endpoint" "dbtestlabsourceendpoint" {
-  endpoint_id                 = "db-test-lab-endpoint-source-${random_id.rando.hex}"
+resource "aws_dms_endpoint" "dbtestlab_source_endpoint" {
+  endpoint_id                 = "${var.application}-endpoint-source-${random_id.rando.hex}"
   database_name               = "${var.dms_endpoint_dbname}-${random_id.rando.hex}"
   endpoint_type               = "source"
   engine_name                 = "sqlserver"
@@ -101,4 +101,27 @@ resource "aws_dms_endpoint" "dbtestlabsourceendpoint" {
   tags = local.common-tags
 
   username = module.db.db_instance_username
+}
+
+# DMS Destination Endpoint
+resource "aws_dms_endpoint" "dbtestlab_dest_endpoint" {
+  endpoint_id                 = "${var.application}-endpoint-dest-${random_id.rando.hex}"
+  endpoint_type               = "target"
+  engine_name                 = "s3"
+
+  tags = local.common-tags
+
+}
+
+# Create a new replication task
+resource "aws_dms_replication_task" "dbtestlab_repl_task" {
+  migration_type            = "full-load-and-cdc"
+  replication_instance_arn  = aws_dms_replication_instance.replinstance.replication_instance_arn
+  replication_task_id       = "${var.application}-repl-task-${random_id.rando.hex}"
+  replication_task_settings = "..."
+  source_endpoint_arn       = aws_dms_endpoint.dbtestlab_source_endpoint.endpoint_arn
+  target_endpoint_arn = aws_dms_endpoint.dbtestlab_dest_endpoint.endpoint_arn
+  table_mappings            = "{\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"1\",\"rule-name\":\"1\",\"object-locator\":{\"schema-name\":\"%\",\"table-name\":\"%\"},\"rule-action\":\"include\"}]}"
+
+  tags = local.common-tags
 }
