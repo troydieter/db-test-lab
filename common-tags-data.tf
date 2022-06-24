@@ -17,3 +17,13 @@ resource "random_integer" "rando_int" {
   min = 1
   max = 100
 }
+
+resource "random_password" "fileshare_pw" {
+  length           = 16
+  special          = false
+}
+
+resource "random_password" "activedir_pw" {
+  length           = 16
+  special          = true
+}

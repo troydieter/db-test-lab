@@ -26,18 +26,6 @@ variable "gateway_ip_address" {
   type        = string
 }
 
-variable "smb_guest_password" {
-  description = "Password for the File Gateway File Share"
-  type        = string
-  default     = "majic123400"
-}
-
-variable "active_directory_pw" {
-  description = "Default password for Active Directory"
-  type        = string
-  default     = "maj!c8800!!"
-}
-
 variable "dms_endpoint_dbname" {
   description = "Database name used for the source DMS endpoint"
   type        = string

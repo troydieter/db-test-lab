@@ -4,7 +4,7 @@
 
 resource "aws_directory_service_directory" "testlab" {
   name     = "corp.dbtestlab.com"
-  password = var.active_directory_pw
+  password = random_password.activedir_pw.result
   edition  = "Standard"
   type     = "MicrosoftAD"
 
@@ -80,7 +80,7 @@ module "db" {
   maintenance_window              = "Mon:00:00-Mon:03:00"
   backup_window                   = "03:00-06:00"
   enabled_cloudwatch_logs_exports = ["error"]
-  create_cloudwatch_log_group     = true
+  create_cloudwatch_log_group     = false
   db_subnet_group_name            = module.vpc.database_subnet_group_name
   create_db_option_group          = false
   create_db_parameter_group       = false
@@ -112,4 +112,10 @@ module "db" {
   db_subnet_group_tags = {
     "Sensitive" = "high"
   }
+}
+
+output "ad_pw" {
+  value = random_password.activedir_pw.result
+  description = "The password for the AWS Managed Active Directory Administrator User"
+  sensitive = true
 }
