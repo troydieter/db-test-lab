@@ -5,10 +5,10 @@
 
 # S3 Bucket creation for file share
 
-module "filegw_dest_bucket" {
+module "volgw_dest_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket = "file-gateway-share-${random_id.rando.hex}"
+  bucket = "vol-gateway-share-${random_id.rando.hex}"
   acl    = "private"
 
   versioning = {
@@ -21,9 +21,9 @@ module "filegw_dest_bucket" {
 
 # IAM role and policy
 
-resource "aws_iam_role" "filegw_role" {
-  name        = "s3_filegateway_role-${random_id.rando.hex}"
-  description = "Used for S3 file gateway fileshares"
+resource "aws_iam_role" "volgw_role" {
+  name        = "s3_volgateway_role-${random_id.rando.hex}"
+  description = "Used for S3 vol gateway fileshares"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -40,7 +40,7 @@ resource "aws_iam_role" "filegw_role" {
   tags = local.common-tags
 }
 
-resource "aws_iam_policy" "filegw_pol" {
+resource "aws_iam_policy" "volgw_pol" {
   name        = "s3_filegateway_pol-${random_id.rando.hex}"
   description = "Used for S3 file gateway fileshares"
   policy      = <<EOF
@@ -56,7 +56,7 @@ resource "aws_iam_policy" "filegw_pol" {
                 "s3:ListBucketVersions",
                 "s3:ListBucketMultipartUploads"
             ],
-            "Resource": "arn:aws:s3:::${module.filegw_dest_bucket.s3_bucket_id}",
+            "Resource": "arn:aws:s3:::${module.volgw_dest_bucket.s3_bucket_id}",
             "Effect": "Allow"
         },
         {
@@ -71,7 +71,7 @@ resource "aws_iam_policy" "filegw_pol" {
                 "s3:PutObject",
                 "s3:PutObjectAcl"
             ],
-            "Resource": "arn:aws:s3:::${module.filegw_dest_bucket.s3_bucket_id}/*",
+            "Resource": "arn:aws:s3:::${module.volgw_dest_bucket.s3_bucket_id}/*",
             "Effect": "Allow"
         }
     ]
@@ -80,26 +80,26 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "filegw_attach" {
-  role       = aws_iam_role.filegw_role.name
-  policy_arn = aws_iam_policy.filegw_pol.arn
+  role       = aws_iam_role.volgw_role.name
+  policy_arn = aws_iam_policy.volgw_pol.arn
 }
 
 # File Storage Gateway File Share
 
-resource "aws_storagegateway_smb_file_share" "local_filegateway_share" {
-  authentication        = "ActiveDirectory"
-  gateway_arn           = aws_storagegateway_gateway.local_filegateway.arn
-  location_arn          = module.filegw_dest_bucket.s3_bucket_arn
-  role_arn              = aws_iam_role.filegw_role.arn
-  audit_destination_arn = module.file_share_log_group.cloudwatch_log_group_arn
+resource "aws_storagegateway_smb_file_share" "local_volgateway_share" {
+  authentication        = "GUEST"
+  gateway_arn           = aws_storagegateway_gateway.local_volgateway.arn
+  location_arn          = module.volgw_dest_bucket.s3_bucket_arn
+  role_arn              = aws_iam_role.volgw_role.arn
+  audit_destination_arn = module.vol_share_log_group.cloudwatch_log_group_arn
   tags                  = local.common-tags
   depends_on = [
-    aws_storagegateway_gateway.local_filegateway
+    aws_storagegateway_gateway.local_volgateway
   ]
 }
 
 # Audit logs for fileshare
-module "file_share_log_group" {
+module "vol_share_log_group" {
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
   version = "~> 3.0"
 
