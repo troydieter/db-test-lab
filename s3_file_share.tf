@@ -87,7 +87,7 @@ resource "aws_iam_role_policy_attachment" "filegw_attach" {
 # File Storage Gateway File Share
 
 resource "aws_storagegateway_smb_file_share" "local_filegateway_share" {
-  authentication        = "GuestAccess"
+  authentication        = "ActiveDirectory"
   gateway_arn           = aws_storagegateway_gateway.local_filegateway.arn
   location_arn          = module.filegw_dest_bucket.s3_bucket_arn
   role_arn              = aws_iam_role.filegw_role.arn

@@ -21,12 +21,11 @@ resource "aws_storagegateway_gateway" "local_filegateway" {
   gateway_timezone         = "GMT-4:00"
   gateway_type             = "FILE_S3"
   cloudwatch_log_group_arn = module.file_storage_gateway_log_group.cloudwatch_log_group_arn
-  smb_guest_password       = random_password.fileshare_pw.result
+  smb_active_directory_settings {
+    domain_name = aws_directory_service_directory.testlab.name
+    password = random_password.activedir_pw.result
+    username = "Administrator"
+    domain_controllers = aws_directory_service_directory.testlab.dns_ip_addresses
+  }
   tags                     = local.common-tags
-}
-
-output "fileshare_pw" {
-  value = random_password.fileshare_pw.result
-  description = "The password (via guest access) to access the File Storage Gateway fileshare"
-  sensitive = true
 }
