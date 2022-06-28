@@ -21,5 +21,6 @@ resource "aws_storagegateway_gateway" "local_volgateway" {
   gateway_timezone         = "GMT-4:00"
   gateway_type             = "CACHED"
   cloudwatch_log_group_arn = module.vol_gateway_log_group.cloudwatch_log_group_arn
+  smb_guest_password       = random_password.fileshare_pw.result
   tags                     = local.common-tags
 }

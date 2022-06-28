@@ -86,23 +86,23 @@ resource "aws_iam_role_policy_attachment" "filegw_attach" {
 
 # File Storage Gateway File Share
 
-resource "aws_storagegateway_smb_file_share" "local_volgateway_share" {
-  authentication        = "GUEST"
-  gateway_arn           = aws_storagegateway_gateway.local_volgateway.arn
-  location_arn          = module.volgw_dest_bucket.s3_bucket_arn
-  role_arn              = aws_iam_role.volgw_role.arn
-  audit_destination_arn = module.vol_share_log_group.cloudwatch_log_group_arn
-  tags                  = local.common-tags
-  depends_on = [
-    aws_storagegateway_gateway.local_volgateway
-  ]
-}
+# resource "aws_storagegateway_smb_file_share" "local_volgateway_share" {
+#   authentication        = "GUEST"
+#   gateway_arn           = aws_storagegateway_gateway.local_volgateway.arn
+#   location_arn          = module.volgw_dest_bucket.s3_bucket_arn
+#   role_arn              = aws_iam_role.volgw_role.arn
+#   audit_destination_arn = module.vol_share_log_group.cloudwatch_log_group_arn
+#   tags                  = local.common-tags
+#   depends_on = [
+#     aws_storagegateway_gateway.local_volgateway
+#   ]
+# }
 
-# Audit logs for fileshare
-module "vol_share_log_group" {
-  source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
-  version = "~> 3.0"
+# # Audit logs for fileshare
+# module "vol_share_log_group" {
+#   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
+#   version = "~> 3.0"
 
-  name              = "testlab-log-group-fileshare-${random_id.rando.hex}"
-  retention_in_days = 30
-}
+#   name              = "testlab-log-group-fileshare-${random_id.rando.hex}"
+#   retention_in_days = 30
+# }

@@ -22,7 +22,7 @@ variable "application" {
 }
 
 variable "gateway_ip_address" {
-  description = "IP Address of the File Storage Gateway Appliance"
+  description = "IP Address of the Volume Gateway Appliance"
   type        = string
 }
 
