@@ -58,3 +58,8 @@ module "db" {
     "Sensitive" = "high"
   }
 }
+
+output "db_address" {
+  description = "The RDS source address"
+  value = module.db.db_instance_address
+}
