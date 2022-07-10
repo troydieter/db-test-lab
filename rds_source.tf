@@ -115,7 +115,7 @@ module "db" {
 }
 
 output "ad_pw" {
-  value = random_password.activedir_pw.result
+  value       = random_password.activedir_pw.result
   description = "The password for the AWS Managed Active Directory Administrator User"
-  sensitive = true
+  sensitive   = true
 }

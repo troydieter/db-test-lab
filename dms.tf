@@ -171,11 +171,12 @@ resource "aws_dms_endpoint" "dbtestlab_source_endpoint" {
   database_name               = "${var.dms_endpoint_dbname}-${random_id.rando.hex}"
   endpoint_type               = "source"
   engine_name                 = "sqlserver"
+  certificate_arn             = var.dms_certificate_arn
+  ssl_mode                    = "verify-full"
   extra_connection_attributes = ""
   password                    = module.db.db_instance_password
   port                        = module.db.db_instance_port
   server_name                 = module.db.db_instance_endpoint
-  ssl_mode                    = "none"
 
   tags = local.common-tags
 
@@ -184,14 +185,14 @@ resource "aws_dms_endpoint" "dbtestlab_source_endpoint" {
 
 # DMS Destination Endpoint
 resource "aws_dms_endpoint" "dbtestlab_dest_endpoint" {
-  endpoint_id                 = "${var.application}-endpoint-dest-${random_id.rando.hex}"
-  endpoint_type               = "target"
-  engine_name                 = "s3"
+  endpoint_id   = "${var.application}-endpoint-dest-${random_id.rando.hex}"
+  endpoint_type = "target"
+  engine_name   = "s3"
   s3_settings {
     service_access_role_arn = aws_iam_role.dms_s3_role.arn
-    bucket_name = module.dms_endpoint_s3_bucket.s3_bucket_id
-    bucket_folder = "dms_dest"
-    compression_type = "GZIP"
+    bucket_name             = module.dms_endpoint_s3_bucket.s3_bucket_id
+    bucket_folder           = "dms_dest"
+    compression_type        = "GZIP"
   }
 
   tags = local.common-tags
@@ -200,12 +201,12 @@ resource "aws_dms_endpoint" "dbtestlab_dest_endpoint" {
 
 # Create a new replication task
 resource "aws_dms_replication_task" "dbtestlab_repl_task" {
-  migration_type            = "full-load-and-cdc"
-  replication_instance_arn  = aws_dms_replication_instance.replinstance.replication_instance_arn
-  replication_task_id       = "${var.application}-repl-task-${random_id.rando.hex}"
-  source_endpoint_arn       = aws_dms_endpoint.dbtestlab_source_endpoint.endpoint_arn
-  target_endpoint_arn = aws_dms_endpoint.dbtestlab_dest_endpoint.endpoint_arn
-  table_mappings            = "{\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"1\",\"rule-name\":\"1\",\"object-locator\":{\"schema-name\":\"%\",\"table-name\":\"%\"},\"rule-action\":\"include\"}]}"
+  migration_type           = "full-load-and-cdc"
+  replication_instance_arn = aws_dms_replication_instance.replinstance.replication_instance_arn
+  replication_task_id      = "${var.application}-repl-task-${random_id.rando.hex}"
+  source_endpoint_arn      = aws_dms_endpoint.dbtestlab_source_endpoint.endpoint_arn
+  target_endpoint_arn      = aws_dms_endpoint.dbtestlab_dest_endpoint.endpoint_arn
+  table_mappings           = "{\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"1\",\"rule-name\":\"1\",\"object-locator\":{\"schema-name\":\"%\",\"table-name\":\"%\"},\"rule-action\":\"include\"}]}"
 
   tags = local.common-tags
 }

@@ -26,7 +26,7 @@ resource "aws_storagegateway_gateway" "local_filegateway" {
 }
 
 output "fileshare_pw" {
-  value = random_password.fileshare_pw.result
+  value       = random_password.fileshare_pw.result
   description = "The password (via guest access) to access the File Storage Gateway fileshare"
-  sensitive = true
+  sensitive   = true
 }

@@ -19,11 +19,11 @@ resource "random_integer" "rando_int" {
 }
 
 resource "random_password" "fileshare_pw" {
-  length           = 16
-  special          = false
+  length  = 16
+  special = false
 }
 
 resource "random_password" "activedir_pw" {
-  length           = 16
-  special          = true
+  length  = 16
+  special = true
 }

@@ -31,3 +31,8 @@ variable "dms_endpoint_dbname" {
   type        = string
   default     = "labdb"
 }
+
+variable "dms_certificate_arn" {
+  description = "Certificate chain used with DMS"
+  type        = string
+}
