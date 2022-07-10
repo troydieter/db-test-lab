@@ -52,7 +52,7 @@ module "security_group" {
       to_port     = 3306
       protocol    = "tcp"
       description = "MSSQL access from calling user"
-      cidr_blocks = ["${local.ifconfig_co_json.ip}/32"]
+      cidr_blocks = "${local.ifconfig_co_json.ip}/32"
     },
   ]
 
