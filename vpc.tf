@@ -19,6 +19,17 @@ module "vpc" {
   tags = local.common-tags
 }
 
+data "http" "my_public_ip" {
+  url = "https://ifconfig.co/json"
+  request_headers = {
+    Accept = "application/json"
+  }
+}
+
+locals {
+  ifconfig_co_json = jsondecode(data.http.my_public_ip.body)
+}
+
 module "security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "~> 4.0"
@@ -35,6 +46,13 @@ module "security_group" {
       protocol    = "tcp"
       description = "MSSQL access from within VPC"
       cidr_blocks = module.vpc.vpc_cidr_block
+    },
+    {
+      from_port   = 3306
+      to_port     = 3306
+      protocol    = "tcp"
+      description = "MSSQL access from calling user"
+      cidr_blocks = ["${local.ifconfig_co_json.ip}/32"]
     },
   ]
 
