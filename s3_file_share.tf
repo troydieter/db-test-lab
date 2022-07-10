@@ -12,7 +12,7 @@ module "filegw_dest_bucket" {
   acl    = "private"
 
   versioning = {
-    enabled = true
+    enabled = false
   }
 
   tags = local.common-tags
