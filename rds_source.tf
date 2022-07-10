@@ -67,9 +67,11 @@ output "db_address" {
 output "db_username" {
   description = "The RDS source username"
   value = module.db.db_instance_username
+  sensitive = true
 }
 
 output "db_password" {
   description = "The RDS source password"
   value = module.db.db_instance_password
+  sensitive = true
 }
