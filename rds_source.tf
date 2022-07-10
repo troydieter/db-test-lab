@@ -14,6 +14,7 @@ module "db" {
   family               = "mysql8.0" # DB parameter group
   major_engine_version = "8.0"      # DB option group
   instance_class       = "db.t3.small"
+  db_name = "dbtestlab-${random_id.rando.hex}"
 
   allocated_storage     = 20
   max_allocated_storage = 100
@@ -74,4 +75,9 @@ output "db_password" {
   description = "The RDS source password"
   value = module.db.db_instance_password
   sensitive = true
+}
+
+output "db_name" {
+  description = "The name of the database"
+  value = module.db.db_instance_name
 }
