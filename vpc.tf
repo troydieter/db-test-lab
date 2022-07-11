@@ -15,6 +15,8 @@ module "vpc" {
   database_subnets = ["10.77.7.0/24", "10.77.8.0/24", "10.77.9.0/24"]
 
   create_database_subnet_group = true
+  enable_dns_hostnames         = true
+  enable_dns_support           = true
 
   tags = local.common-tags
 }
@@ -53,6 +55,15 @@ module "security_group" {
       protocol    = "tcp"
       description = "MSSQL access from calling user"
       cidr_blocks = "${local.ifconfig_co_json.ip}/32"
+    },
+  ]
+  egress_with_cidr_blocks = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      description = "Allow all out"
+      cidr_blocks = "0.0.0.0/0"
     },
   ]
 

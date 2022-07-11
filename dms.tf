@@ -182,7 +182,7 @@ resource "aws_dms_endpoint" "dbtestlab_source_endpoint" {
   extra_connection_attributes = ""
   password                    = module.db.db_instance_password
   port                        = module.db.db_instance_port
-  server_name                 = module.db.db_instance_endpoint
+  server_name                 = module.db.db_instance_address
 
   tags = local.common-tags
 
