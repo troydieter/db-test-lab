@@ -1,3 +1,55 @@
+################################################################################
+# AWS Directory Service (Acitve Directory)
+################################################################################
+
+resource "aws_directory_service_directory" "testlab" {
+  name     = "corp.dbtestlab.com"
+  password = random_password.activedir_pw.result
+  edition  = "Standard"
+  type     = "MicrosoftAD"
+
+  vpc_settings {
+    vpc_id = module.vpc.vpc_id
+    # Only 2 subnets, must be in different AZs
+    subnet_ids = slice(tolist(module.vpc.database_subnets), 0, 2)
+  }
+
+  tags = local.common-tags
+}
+
+################################################################################
+# IAM Role for Windows Authentication
+################################################################################
+
+data "aws_iam_policy_document" "rds_assume_role" {
+  statement {
+    sid = "AssumeRole"
+
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["rds.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "rds_ad_auth" {
+  name                  = "rdstestlab-rds-ad-auth-${random_id.rando.hex}"
+  description           = "Role used by RDS for Active Directory authentication and authorization"
+  force_detach_policies = true
+  assume_role_policy    = data.aws_iam_policy_document.rds_assume_role.json
+
+  tags = local.common-tags
+}
+
+resource "aws_iam_role_policy_attachment" "rds_directory_services" {
+  role       = aws_iam_role.rds_ad_auth.id
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSDirectoryServiceAccess"
+}
+
 ###############
 # RDS Source Resources
 ###############
@@ -9,10 +61,10 @@ module "db" {
   version = "4.3.0"
 
   identifier           = "dbtestlabrds${random_id.rando.hex}"
-  engine               = "mysql"
-  engine_version       = "8.0.27"
-  family               = "mysql8.0" # DB parameter group
-  major_engine_version = "8.0"      # DB option group
+  engine               = "sqlserver-ex"
+  engine_version       = "15.00.4153.1.v1"
+  family               = "sqlserver-ex-15.0" # DB parameter group
+  major_engine_version = "15.00"             # DB option group
   instance_class       = "db.t3.small"
   db_name              = "dbtestlab${random_id.rando.hex}"
 
@@ -20,7 +72,7 @@ module "db" {
   max_allocated_storage = 100
 
   username = "dblabs_user"
-  port     = 3306
+  port     = 1433
 
   multi_az                        = false
   subnet_ids                      = module.vpc.database_subnets
@@ -34,6 +86,8 @@ module "db" {
   create_db_parameter_group       = false
   storage_encrypted               = false
   publicly_accessible             = true
+  domain                          = aws_directory_service_directory.testlab.id
+  domain_iam_role_name            = aws_iam_role.rds_ad_auth.name
 
   backup_retention_period = 7
   skip_final_snapshot     = true
@@ -81,4 +135,10 @@ output "db_password" {
 output "db_name" {
   description = "The name of the database"
   value       = module.db.db_instance_name
+}
+
+output "ad_pw" {
+  value       = random_password.activedir_pw.result
+  description = "The password for the AWS Managed Active Directory Administrator User"
+  sensitive   = true
 }

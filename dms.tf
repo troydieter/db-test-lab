@@ -176,7 +176,7 @@ resource "aws_dms_endpoint" "dbtestlab_source_endpoint" {
   endpoint_id                 = "${var.application}-endpoint-source-${random_id.rando.hex}"
   database_name               = module.db.db_instance_name
   endpoint_type               = "source"
-  engine_name                 = "mysql"
+  engine_name                 = "sqlserver"
   certificate_arn             = aws_dms_certificate.aws_us_east_1_chain.certificate_arn
   ssl_mode                    = "verify-full"
   extra_connection_attributes = ""
