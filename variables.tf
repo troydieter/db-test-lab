@@ -31,3 +31,9 @@ variable "dms_endpoint_dbname" {
   type        = string
   default     = "labdb"
 }
+
+variable "active_directory_pw" {
+  description = "Default password for Active Directory"
+  type        = string
+  default     = "maj!c8800!!"
+}
