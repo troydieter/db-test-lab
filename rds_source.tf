@@ -66,7 +66,6 @@ module "db" {
   family               = "sqlserver-ex-15.0" # DB parameter group
   major_engine_version = "15.00"             # DB option group
   instance_class       = "db.t3.small"
-  db_name              = "dbtestlab${random_id.rando.hex}"
 
   allocated_storage     = 20
   max_allocated_storage = 100
