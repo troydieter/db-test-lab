@@ -21,11 +21,6 @@ variable "application" {
   default     = "db-test-lab"
 }
 
-variable "gateway_ip_address" {
-  description = "IP Address of the File Storage Gateway Appliance"
-  type        = string
-}
-
 variable "dms_endpoint_dbname" {
   description = "Database name used for the source DMS endpoint"
   type        = string
